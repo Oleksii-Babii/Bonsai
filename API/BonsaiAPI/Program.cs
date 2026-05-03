@@ -7,19 +7,18 @@ using System.Runtime.InteropServices;
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseWebRoot("wwwroot");
 
-var useInMemoryDatabase = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+var useInMemory = builder.Environment.IsEnvironment("Testing")
+    || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+var testDbName = builder.Configuration["TestDbName"] ?? "BonsaiLocalDev";
 
 builder.Services.AddDbContext<BonsaiContext>(options =>
 {
-    if (useInMemoryDatabase)
-    {
-        options.UseInMemoryDatabase("BonsaiLocalDev");
-    }
+    if (useInMemory)
+        options.UseInMemoryDatabase(testDbName);
     else
-    {
         options.UseSqlServer(builder.Configuration.GetConnectionString("BonsaiContext")
             ?? throw new InvalidOperationException("Connection string 'BonsaiContext' not found."));
-    }
 });
 
 builder.Services.AddControllers()
@@ -36,7 +35,6 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
-// Allow image uploads up to 10 MB
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
@@ -51,7 +49,7 @@ Directory.CreateDirectory(Path.Combine(webRootPath, "uploads"));
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BonsaiContext>();
-    if (db.Database.IsInMemory())
+    if (useInMemory)
         db.Database.EnsureCreated();
     else
         db.Database.Migrate();
