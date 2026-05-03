@@ -51,14 +51,10 @@ Directory.CreateDirectory(Path.Combine(webRootPath, "uploads"));
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BonsaiContext>();
-    if (useInMemoryDatabase)
-    {
+    if (db.Database.IsInMemory())
         db.Database.EnsureCreated();
-    }
     else
-    {
         db.Database.Migrate();
-    }
 }
 
 app.UseSwagger();
@@ -78,3 +74,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program {}

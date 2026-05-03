@@ -1,0 +1,92 @@
+name: API — Build and Deploy
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'API/**'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'API/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        working-directory: API/BonsaiAPI
+        run: dotnet restore
+
+      - name: Build
+        working-directory: API/BonsaiAPI
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Publish
+        working-directory: API/BonsaiAPI
+        run: dotnet publish BonsaiAPI.csproj --configuration Release --output ${{ github.workspace }}/publish
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-publish
+          path: ${{ github.workspace }}/publish
+          retention-days: 1
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run tests
+        working-directory: API
+        run: dotnet test BonsaiAPI.Tests/BonsaiAPI.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory ${{ github.workspace }}/test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ${{ github.workspace }}/test-results
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://bonsaiapi.azurewebsites.net
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api-publish
+          path: publish
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: bonsaiapi
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: publish
