@@ -1,0 +1,5 @@
+<step title="Incoming Request" date="2026-05-03T18:50:48.809" instance="bbcb4c" url="/logstream/application" method="GET" type="request" pid="853,1,40" Host="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" User-Agent="AZURECLI/2.74.0 (MSI)" Accept-Encoding="identity" Authorization="Bea..." x-ms-client-request-id="f953da9b-4720-11f1-85ed-508140efefa0" X-ARR-LOG-ID="f953da9b-4720-11f1-85ed-508140efefa0" CLIENT-IP="37.228.244.77:14682" X-SITE-DEPLOYMENT-ID="bonsaiapi" WAS-DEFAULT-HOSTNAME="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/logstream/application" X-Client-IP="37.228.244.77" X-Client-Port="14682" >
+  <step title="LogStreamHandlerMiddleware.Invoke" date="2026-05-03T18:50:48.834" /><!-- duration: 105ms -->
+  <step title="Error occurred" date="2026-05-03T18:51:48.941" type="error" text="LogStreamManager: ProcessRequest end" /><!-- duration: 12ms -->
+  <step title="Outgoing response" date="2026-05-03T18:51:48.972" type="response" statusCode="200" statusText="OK" /><!-- duration: 11ms -->
+</step><!-- duration: 60187ms -->

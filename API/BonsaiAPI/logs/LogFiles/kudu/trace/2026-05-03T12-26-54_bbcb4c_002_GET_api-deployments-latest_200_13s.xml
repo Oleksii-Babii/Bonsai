@@ -1,0 +1,19 @@
+<step title="Incoming Request" date="2026-05-03T12:26:54.682" instance="bbcb4c" url="/api/deployments/latest" method="GET" type="request" pid="853,1,15" Host="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" User-Agent="vscode-azureappservice/0.26.5 core-rest-pipeline/1.22.2 Node/22.22.1 (Windows_NT 10.0.26200; x64)" Accept-Encoding="gzip,deflate" Accept-Language="en" Authorization="Bea..." x-ms-correlation-request-id="a758c260-354f-4ac8-9c96-769ddfbd545c" x-ms-client-request-id="cd1e59bd-38df-4ed4-8d12-f664e4a05012" X-ARR-LOG-ID="cd1e59bd-38df-4ed4-8d12-f664e4a05012" CLIENT-IP="37.228.244.77:14737" X-SITE-DEPLOYMENT-ID="bonsaiapi" WAS-DEFAULT-HOSTNAME="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/latest" X-Client-IP="37.228.244.77" X-Client-Port="14737" >
+  <step title="DeploymentService.GetResult" date="2026-05-03T12:27:01.237" >
+    <step title="DeploymentService.GetLatestDeployment" date="2026-05-03T12:27:01.265" >
+      <step title="DeploymentManager.GetResults" date="2026-05-03T12:27:01.317" /><!-- duration: 2922ms -->
+    </step><!-- duration: 3015ms -->
+    <step title="Error determining if deployment lock is valid" date="2026-05-03T12:27:04.419" /><!-- duration: 46ms -->
+    <step title="Error occurred" date="2026-05-03T12:27:04.597" type="error" text="Could not find file &apos;/home/site/locks/deployment/info.lock&apos;." stackTrace="   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String path, OpenFlags flags, Int32 mode, Boolean failForSymlink, Boolean&amp; wasSymlink, Func`4 createOpenException)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64&amp; fileLength, UnixFileMode&amp; filePermissions, Boolean failForSymlink, Boolean&amp; wasSymlink, Func`4 createOpenException)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, Int64 preallocationSize)
+   at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Encoding encoding, Int32 bufferSize)
+   at System.IO.File.ReadAllText(String path, Encoding encoding)
+   at Kudu.Core.AllSafeLinuxLock.IsLockValid() in /tmp/KuduLite/Kudu.Core/AllSafeLinuxLock.cs:line 97
+   at Kudu.Core.AllSafeLinuxLock.get_IsHeld() in /tmp/KuduLite/Kudu.Core/AllSafeLinuxLock.cs:line 42" /><!-- duration: 12ms -->
+    <step title="IsHeld - there were exceptions twice -releasing the lock - ie deleting the lock directory" date="2026-05-03T12:27:05.969" /><!-- duration: 118ms -->
+  </step><!-- duration: 5402ms -->
+  <step title="Outgoing response" date="2026-05-03T12:27:07.543" type="response" statusCode="200" statusText="OK" /><!-- duration: 50ms -->
+</step><!-- duration: 12942ms -->

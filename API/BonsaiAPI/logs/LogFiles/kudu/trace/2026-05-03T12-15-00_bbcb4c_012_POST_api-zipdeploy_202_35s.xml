@@ -1,0 +1,14 @@
+<step title="Incoming Request" date="2026-05-03T12:15:00.895" instance="bbcb4c" url="/api/zipdeploy?author=ms-azuretools-vscode&amp;deployer=ms-azuretools-vscode&amp;isAsync=true&amp;trackDeploymentId=true" method="POST" type="request" pid="853,1,5" Host="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" User-Agent="vscode-azureappservice/0.26.5 core-rest-pipeline/1.22.2 Node/22.22.1 (Windows_NT 10.0.26200; x64)" Accept-Encoding="gzip,deflate" Accept-Language="en" Authorization="Bea..." Transfer-Encoding="chunked" x-ms-correlation-request-id="ccd621e1-8a2a-4e52-96b9-f3abe7a91348" x-ms-client-request-id="3610f1c2-c0aa-4c2e-bf4b-ec140dfb9668" X-ARR-LOG-ID="3610f1c2-c0aa-4c2e-bf4b-ec140dfb9668" CLIENT-IP="37.228.244.77:14785" X-SITE-DEPLOYMENT-ID="bonsaiapi" WAS-DEFAULT-HOSTNAME="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?author=ms-azuretools-vscode&amp;deployer=ms-azuretools-vscode&amp;isAsync=true&amp;trackDeploymentId=true" X-Client-IP="37.228.244.77" X-Client-Port="14785" >
+  <step title="ZipPushDeploy" date="2026-05-03T12:15:00.994" >
+    <step title="ZipDeploy. Extract zip." date="2026-05-03T12:15:01.009" /><!-- duration: 9ms -->
+    <step title="Starting PushDeployAsync" date="2026-05-03T12:15:01.029" /><!-- duration: 7ms -->
+    <step title="Writing artifact to /tmp/zipdeploy/01bcd011-f348-44ea-af98-c9a2c0972d0c.zip" date="2026-05-03T12:15:01.082" >
+      <step title="Writing multipart request body to /tmp/zipdeploy/01bcd011-f348-44ea-af98-c9a2c0972d0c.zip" date="2026-05-03T12:15:01.090" /><!-- duration: 20ms -->
+    </step><!-- duration: 33279ms -->
+    <step title="Start deployment in the background" date="2026-05-03T12:15:34.505" >
+      <step title="Acquiring Deployment Lock" date="2026-05-03T12:15:34.624" /><!-- duration: 75ms -->
+      <step title="Acquired Deployment Lock" date="2026-05-03T12:15:34.874" /><!-- duration: 37ms -->
+    </step><!-- duration: 1009ms -->
+  </step><!-- duration: 34599ms -->
+  <step title="Outgoing response" date="2026-05-03T12:15:35.715" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 41ms -->
+</step><!-- duration: 34921ms -->

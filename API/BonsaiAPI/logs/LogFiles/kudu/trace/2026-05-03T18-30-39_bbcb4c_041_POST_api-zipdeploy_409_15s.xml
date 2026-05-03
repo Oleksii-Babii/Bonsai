@@ -1,0 +1,15 @@
+<step title="Incoming Request" date="2026-05-03T18:30:39.833" instance="bbcb4c" url="/api/zipdeploy?author=ms-azuretools-vscode&amp;deployer=ms-azuretools-vscode&amp;isAsync=true&amp;trackDeploymentId=true" method="POST" type="request" pid="853,1,3" Host="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" User-Agent="vscode-azureappservice/0.26.5 core-rest-pipeline/1.22.2 Node/22.22.1 (Windows_NT 10.0.26200; x64)" Accept-Encoding="gzip,deflate" Accept-Language="en" Authorization="Bea..." Transfer-Encoding="chunked" x-ms-correlation-request-id="082df8af-206b-46bd-962b-47bfa0d94eaf" x-ms-client-request-id="6fc51290-245c-4c74-879c-ae31e251b1f9" X-ARR-LOG-ID="6fc51290-245c-4c74-879c-ae31e251b1f9" CLIENT-IP="37.228.244.77:14608" X-SITE-DEPLOYMENT-ID="bonsaiapi" WAS-DEFAULT-HOSTNAME="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?author=ms-azuretools-vscode&amp;deployer=ms-azuretools-vscode&amp;isAsync=true&amp;trackDeploymentId=true" X-Client-IP="37.228.244.77" X-Client-Port="14608" >
+  <step title="ZipPushDeploy" date="2026-05-03T18:30:39.872" >
+    <step title="ZipDeploy. Extract zip." date="2026-05-03T18:30:39.901" /><!-- duration: 8ms -->
+    <step title="Starting PushDeployAsync" date="2026-05-03T18:30:39.924" /><!-- duration: 8ms -->
+    <step title="Writing artifact to /tmp/zipdeploy/a85381f2-394b-41c6-9e30-6cfd03f33c90.zip" date="2026-05-03T18:30:39.972" >
+      <step title="Writing multipart request body to /tmp/zipdeploy/a85381f2-394b-41c6-9e30-6cfd03f33c90.zip" date="2026-05-03T18:30:39.990" /><!-- duration: 22ms -->
+    </step><!-- duration: 14826ms -->
+    <step title="Start deployment in the background" date="2026-05-03T18:30:54.858" >
+      <step title="Acquiring Deployment Lock" date="2026-05-03T18:30:55.027" /><!-- duration: 7ms -->
+      <step title="Cannot Acquire Deployment Lock already held" date="2026-05-03T18:30:55.052" /><!-- duration: 15ms -->
+    </step><!-- duration: 316ms -->
+    <step title="There is a deployment currently in progress. Please try again when it completes." date="2026-05-03T18:30:55.197" /><!-- duration: 7ms -->
+  </step><!-- duration: 15343ms -->
+  <step title="Outgoing response" date="2026-05-03T18:30:55.243" type="response" statusCode="409" statusText="Conflict" /><!-- duration: 7ms -->
+</step><!-- duration: 15451ms -->

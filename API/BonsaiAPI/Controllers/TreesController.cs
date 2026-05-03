@@ -76,17 +76,23 @@ namespace BonsaiAPI.Controllers
             return CreatedAtAction(nameof(GetTree), new { id = tree.Id }, tree);
         }
 
+        public class ImageUploadDto
+        {
+            public IFormFile? Image { get; set; }
+        }
+
         // POST: api/trees/1/image
         [HttpPost("{id:int}/image")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UploadImage([FromRoute] int id, [FromForm] IFormFile image)
+        public async Task<IActionResult> UploadImage([FromRoute] int id, [FromForm] ImageUploadDto dto)
         {
             var tree = await _context.Trees.FindAsync(id);
             if (tree == null) return NotFound();
 
+            var image = dto?.Image;
             if (image == null || image.Length == 0)
                 return BadRequest("No image provided.");
 

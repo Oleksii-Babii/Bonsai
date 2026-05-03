@@ -1,0 +1,6 @@
+<step title="Incoming Request" date="2026-05-03T12:11:45.887" instance="bbcb4c" url="/api/deployments/temp-26327fc7/log" method="GET" type="request" pid="853,1,17" Host="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" User-Agent="vscode-azureappservice/0.26.5 core-rest-pipeline/1.22.2 Node/22.22.1 (Windows_NT 10.0.26200; x64)" Accept-Encoding="gzip,deflate" Accept-Language="en" Authorization="Bea..." x-ms-correlation-request-id="44eaa685-47b5-444d-873e-f8337080f032" x-ms-client-request-id="b5219ce8-c9db-433d-869c-fe02b96aa404" X-ARR-LOG-ID="b5219ce8-c9db-433d-869c-fe02b96aa404" CLIENT-IP="37.228.244.77:14715" X-SITE-DEPLOYMENT-ID="bonsaiapi" WAS-DEFAULT-HOSTNAME="bonsaiapi-ewe7gdd0hfd8a8dv.scm.westeurope-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/temp-26327fc7/log" X-Client-IP="37.228.244.77" X-Client-Port="14715" >
+  <step title="DeploymentService.GetLogEntry" date="2026-05-03T12:11:45.927" >
+    <step title="DeploymentManager.GetLogEntries(id:temp-26327fc7)" date="2026-05-03T12:11:45.936" /><!-- duration: 24ms -->
+  </step><!-- duration: 44ms -->
+  <step title="Outgoing response" date="2026-05-03T12:11:45.995" type="response" statusCode="200" statusText="OK" /><!-- duration: 12ms -->
+</step><!-- duration: 128ms -->

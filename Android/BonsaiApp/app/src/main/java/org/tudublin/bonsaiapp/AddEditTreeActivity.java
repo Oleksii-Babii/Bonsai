@@ -27,11 +27,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -46,19 +42,24 @@ public class AddEditTreeActivity extends AppCompatActivity {
     private ActivityAddEditTreeBinding binding;
     private List<Species> speciesList = new ArrayList<>();
     private int editTreeId = -1;
-    private Uri selectedPhotoUri = null;
     private String pendingImageData = null;
 
     private final ActivityResultLauncher<String> pickPhotoLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
-                    selectedPhotoUri = uri;
-                    Glide.with(this)
-                            .load(uri)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .centerCrop()
-                            .into(binding.imagePreview);
-                    binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                    try {
+                        byte[] bytes = compressPhoto(uri);
+                        pendingImageData = Base64.encodeToString(bytes, Base64.NO_WRAP);
+                        Glide.with(this)
+                                .load(bytes)
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .centerCrop()
+                                .into(binding.imagePreview);
+                        binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Photo processing error", e);
+                        Toast.makeText(this, "Photo processing error", Toast.LENGTH_LONG).show();
+                    }
                 }
             });
 
@@ -186,12 +187,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Tree> call, Response<Tree> response) {
                     if (response.isSuccessful()) {
-                        Tree savedTree = response.body();
-                        if (savedTree != null) {
-                            uploadPhotoIfNeeded(savedTree.getId());
-                        } else {
-                            completeSaveSuccess();
-                        }
+                        completeSaveSuccess();
                     } else {
                         binding.btnSave.setEnabled(true);
                         binding.btnSave.setText(R.string.btn_save);
@@ -212,7 +208,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        uploadPhotoIfNeeded(editTreeId);
+                        completeSaveSuccess();
                     } else {
                         binding.btnSave.setEnabled(true);
                         binding.btnSave.setText(R.string.btn_save);
@@ -230,55 +226,8 @@ public class AddEditTreeActivity extends AppCompatActivity {
         }
     }
 
-    private void uploadPhotoIfNeeded(int treeId) {
-        if (selectedPhotoUri == null) {
-            completeSaveSuccess();
-            return;
-        }
-
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                byte[] imageBytes = compressSelectedPhoto();
-                String mimeType = "image/jpeg";
-                RequestBody fileBody = RequestBody.create(MediaType.parse(mimeType), imageBytes);
-                MultipartBody.Part imagePart = MultipartBody.Part.createFormData(
-                        "image",
-                        "tree_" + treeId + ".jpg",
-                        fileBody
-                );
-
-                RetrofitClient.getService().uploadTreeImage(treeId, imagePart).enqueue(new Callback<okhttp3.ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
-                        if (response.isSuccessful()) {
-                            completeSaveSuccess();
-                        } else {
-                            binding.btnSave.setEnabled(true);
-                            binding.btnSave.setText(R.string.btn_save);
-                            showError("Image upload failed", response);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
-                        binding.btnSave.setEnabled(true);
-                        binding.btnSave.setText(R.string.btn_save);
-                        Toast.makeText(AddEditTreeActivity.this, "Image upload error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "Photo processing error", e);
-                runOnUiThread(() -> {
-                    binding.btnSave.setEnabled(true);
-                    binding.btnSave.setText(R.string.btn_save);
-                    Toast.makeText(AddEditTreeActivity.this, "Photo processing error", Toast.LENGTH_LONG).show();
-                });
-            }
-        });
-    }
-
-    private byte[] compressSelectedPhoto() throws Exception {
-        InputStream is = getContentResolver().openInputStream(selectedPhotoUri);
+    private byte[] compressPhoto(Uri uri) throws Exception {
+        InputStream is = getContentResolver().openInputStream(uri);
 
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inJustDecodeBounds = true;
@@ -290,7 +239,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
             scale *= 2;
         }
 
-        is = getContentResolver().openInputStream(selectedPhotoUri);
+        is = getContentResolver().openInputStream(uri);
         BitmapFactory.Options decodeOpts = new BitmapFactory.Options();
         decodeOpts.inSampleSize = scale;
         Bitmap bmp = BitmapFactory.decodeStream(is, null, decodeOpts);

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -15,6 +15,27 @@ namespace BonsaiAPI.Migrations
                 table: "Trees",
                 type: "nvarchar(max)",
                 nullable: true);
+
+            migrationBuilder.UpdateData(
+                table: "Trees",
+                keyColumn: "Id",
+                keyValue: 1,
+                column: "ImageData",
+                value: null);
+
+            migrationBuilder.UpdateData(
+                table: "Trees",
+                keyColumn: "Id",
+                keyValue: 2,
+                column: "ImageData",
+                value: null);
+
+            migrationBuilder.UpdateData(
+                table: "Trees",
+                keyColumn: "Id",
+                keyValue: 3,
+                column: "ImageData",
+                value: null);
         }
 
         /// <inheritdoc />
