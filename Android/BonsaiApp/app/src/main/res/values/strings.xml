@@ -45,4 +45,6 @@
     <string name="label_home_subtitle">Cultivate patience. Grow beauty.</string>
     <string name="empty_no_trees">No trees in your collection yet.\nTap + to add one.</string>
     <string name="empty_no_species">No species available.</string>
+    <string name="label_species_subtitle">Discover all bonsai varieties</string>
+    <string name="label_collection_subtitle">Manage your personal trees</string>
 </resources>

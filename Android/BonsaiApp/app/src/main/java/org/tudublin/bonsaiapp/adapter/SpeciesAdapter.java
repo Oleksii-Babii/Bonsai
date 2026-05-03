@@ -10,10 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.tudublin.bonsaiapp.R;
 import org.tudublin.bonsaiapp.model.Species;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHolder> {
@@ -22,12 +24,16 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
         void onItemClick(Species species);
     }
 
-    private final List<Species> items;
+    private List<Species> items = new ArrayList<>();
     private final OnItemClickListener listener;
 
-    public SpeciesAdapter(List<Species> items, OnItemClickListener listener) {
-        this.items = items;
+    public SpeciesAdapter(OnItemClickListener listener) {
         this.listener = listener;
+    }
+
+    public void updateData(List<Species> newItems) {
+        items = newItems;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -43,15 +49,18 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
         holder.textName.setText(species.getName());
         holder.textOrigin.setText(species.getOriginCountry());
         holder.textDifficulty.setText(species.getDifficultyLevel());
+
         if (species.getImageUrl() != null && !species.getImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(species.getImageUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.ic_tree_placeholder)
                     .centerCrop()
                     .into(holder.imageSpecies);
         } else {
             holder.imageSpecies.setImageResource(R.drawable.ic_tree_placeholder);
         }
+
         holder.itemView.setOnClickListener(v -> listener.onItemClick(species));
     }
 

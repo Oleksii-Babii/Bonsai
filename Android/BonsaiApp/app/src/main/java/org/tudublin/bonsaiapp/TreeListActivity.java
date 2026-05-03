@@ -2,6 +2,8 @@ package org.tudublin.bonsaiapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,7 +30,12 @@ import retrofit2.Response;
 public class TreeListActivity extends AppCompatActivity {
 
     private static final String TAG = "BonsaiApp";
+    private static final long SEARCH_DEBOUNCE_MS = 300;
+
     private ActivityTreeListBinding binding;
+    private TreeAdapter treeAdapter;
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +49,15 @@ public class TreeListActivity extends AppCompatActivity {
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
+        treeAdapter = new TreeAdapter(tree -> {
+            Intent intent = new Intent(TreeListActivity.this, TreeDetailActivity.class);
+            intent.putExtra(TreeDetailActivity.EXTRA_TREE_ID, tree.getId());
+            startActivity(intent);
+        });
+
         binding.recyclerTrees.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerTrees.setHasFixedSize(true);
+        binding.recyclerTrees.setAdapter(treeAdapter);
 
         binding.editSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -50,12 +65,13 @@ public class TreeListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
                 String query = s.toString().trim();
-                if (query.isEmpty()) {
-                    loadAllTrees();
-                } else {
-                    searchTrees(query);
-                }
+                searchRunnable = () -> {
+                    if (query.isEmpty()) loadAllTrees();
+                    else searchTrees(query);
+                };
+                searchHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_MS);
             }
 
             @Override
@@ -67,8 +83,6 @@ public class TreeListActivity extends AppCompatActivity {
             Intent intent = new Intent(TreeListActivity.this, AddEditTreeActivity.class);
             startActivity(intent);
         });
-
-        loadAllTrees();
     }
 
     @Override
@@ -132,11 +146,6 @@ public class TreeListActivity extends AppCompatActivity {
 
     private void displayTrees(List<Tree> trees) {
         binding.emptyView.setVisibility(trees.isEmpty() ? View.VISIBLE : View.GONE);
-        TreeAdapter adapter = new TreeAdapter(trees, tree -> {
-            Intent intent = new Intent(TreeListActivity.this, TreeDetailActivity.class);
-            intent.putExtra(TreeDetailActivity.EXTRA_TREE_ID, tree.getId());
-            startActivity(intent);
-        });
-        binding.recyclerTrees.setAdapter(adapter);
+        treeAdapter.updateData(trees);
     }
 }

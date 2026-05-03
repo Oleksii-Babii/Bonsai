@@ -25,6 +25,7 @@ public class SpeciesListActivity extends AppCompatActivity {
 
     private static final String TAG = "BonsaiApp";
     private ActivitySpeciesListBinding binding;
+    private SpeciesAdapter speciesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,15 @@ public class SpeciesListActivity extends AppCompatActivity {
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
+        speciesAdapter = new SpeciesAdapter(species -> {
+            Intent intent = new Intent(SpeciesListActivity.this, SpeciesDetailActivity.class);
+            intent.putExtra(SpeciesDetailActivity.EXTRA_SPECIES_ID, species.getId());
+            startActivity(intent);
+        });
+
         binding.recyclerSpecies.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerSpecies.setHasFixedSize(true);
+        binding.recyclerSpecies.setAdapter(speciesAdapter);
 
         loadSpecies();
     }
@@ -54,13 +63,8 @@ public class SpeciesListActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Species> list = response.body();
                     binding.emptyView.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
-                    SpeciesAdapter adapter = new SpeciesAdapter(list, species -> {
-                        Intent intent = new Intent(SpeciesListActivity.this, SpeciesDetailActivity.class);
-                        intent.putExtra(SpeciesDetailActivity.EXTRA_SPECIES_ID, species.getId());
-                        startActivity(intent);
-                    });
-                    binding.recyclerSpecies.setAdapter(adapter);
-                    Log.d(TAG, "Loaded " + response.body().size() + " species");
+                    speciesAdapter.updateData(list);
+                    Log.d(TAG, "Loaded " + list.size() + " species");
                 }
             }
 

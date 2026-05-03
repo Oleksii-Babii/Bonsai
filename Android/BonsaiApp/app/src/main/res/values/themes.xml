@@ -3,7 +3,7 @@
 
     <style name="Theme.BonsaiApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary -->
-        <item name="colorPrimary">@color/green_700</item>
+        <item name="colorPrimary">@color/green_800</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">@color/green_100</item>
         <item name="colorOnPrimaryContainer">@color/green_900</item>
@@ -15,7 +15,7 @@
         <item name="colorOnSecondaryContainer">@color/brown_700</item>
 
         <!-- Tertiary -->
-        <item name="colorTertiary">@color/green_500</item>
+        <item name="colorTertiary">@color/green_600</item>
         <item name="colorOnTertiary">@color/white</item>
 
         <!-- Surfaces -->
@@ -36,7 +36,7 @@
     </style>
 
     <style name="Widget.BonsaiApp.Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="android:background">@color/green_700</item>
+        <item name="android:background">@color/green_800</item>
         <item name="titleTextColor">@color/white</item>
         <item name="subtitleTextColor">@color/green_100</item>
         <item name="android:theme">@style/ThemeOverlay.BonsaiApp.Toolbar</item>

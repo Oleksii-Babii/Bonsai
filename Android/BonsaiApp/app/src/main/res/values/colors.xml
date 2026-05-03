@@ -1,45 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Bonsai green palette -->
-    <color name="green_50">#E8F5E9</color>
-    <color name="green_100">#C8E6C9</color>
-    <color name="green_200">#A5D6A7</color>
-    <color name="green_300">#81C784</color>
-    <color name="green_400">#66BB6A</color>
-    <color name="green_500">#4CAF50</color>
-    <color name="green_600">#43A047</color>
-    <color name="green_700">#388E3C</color>
-    <color name="green_800">#2E7D32</color>
-    <color name="green_900">#1B5E20</color>
+    <!-- Deep forest green palette (matches website) -->
+    <color name="green_50">#EEF5EB</color>
+    <color name="green_100">#D0E8CA</color>
+    <color name="green_200">#A8CC9F</color>
+    <color name="green_300">#82B079</color>
+    <color name="green_400">#617D58</color>
+    <color name="green_500">#527049</color>
+    <color name="green_600">#456040</color>
+    <color name="green_700">#3A5C34</color>
+    <color name="green_800">#2C4829</color>
+    <color name="green_900">#1A2E17</color>
 
-    <!-- Earth tones -->
-    <color name="brown_300">#A1887F</color>
-    <color name="brown_500">#795548</color>
-    <color name="brown_700">#5D4037</color>
-    <color name="brown_900">#3E2723</color>
-    <color name="cream">#FFF8E6</color>
+    <!-- Warm earth tones -->
+    <color name="brown_300">#C4A882</color>
+    <color name="brown_500">#8B7355</color>
+    <color name="brown_700">#6B5240</color>
+    <color name="brown_900">#3E2A18</color>
+    <color name="cream">#F2EDE4</color>
 
     <!-- Surfaces -->
-    <color name="bg_app">#F4F7F2</color>
+    <color name="bg_app">#F2EDE4</color>
     <color name="surface_card">#FFFFFF</color>
+    <color name="card_border">#DDD5C8</color>
 
     <!-- Text -->
-    <color name="text_primary">#1B1B1F</color>
-    <color name="text_secondary">#5F6368</color>
+    <color name="text_primary">#1A2016</color>
+    <color name="text_secondary">#5A6854</color>
 
     <!-- Difficulty chips -->
-    <color name="chip_easy_bg">#DCEDC8</color>
-    <color name="chip_easy_fg">#33691E</color>
-    <color name="chip_medium_bg">#FFE0B2</color>
-    <color name="chip_medium_fg">#E65100</color>
-    <color name="chip_hard_bg">#FFCDD2</color>
-    <color name="chip_hard_fg">#B71C1C</color>
+    <color name="chip_easy_bg">#D0E8CA</color>
+    <color name="chip_easy_fg">#2C4829</color>
+    <color name="chip_medium_bg">#F5E6C8</color>
+    <color name="chip_medium_fg">#7A4B1A</color>
+    <color name="chip_hard_bg">#F5D0C8</color>
+    <color name="chip_hard_fg">#8B2314</color>
+
+    <!-- Aliases for fragment_contacts.xml compatibility -->
+    <color name="primaryText">#1A2016</color>
+    <color name="secondaryText">#5A6854</color>
+    <color name="discountBg">#D0E8CA</color>
+    <color name="discountText">#2C4829</color>
 
     <!-- Aliases -->
-    <color name="green_primary">#2E7D32</color>
-    <color name="green_primary_dark">#1B5E20</color>
-    <color name="green_accent">#66BB6A</color>
+    <color name="green_primary">#2C4829</color>
+    <color name="green_primary_dark">#1A2E17</color>
+    <color name="green_accent">#3A5C34</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="grey_light">#EAEAEA</color>
+    <color name="grey_light">#E8DFD2</color>
 </resources>
