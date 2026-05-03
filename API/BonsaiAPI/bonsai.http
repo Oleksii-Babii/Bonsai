@@ -1,0 +1,62 @@
+### List all species
+GET http://localhost:5220/api/species
+
+###
+
+### Get a single species
+GET http://localhost:5220/api/species/1
+
+###
+
+### List all trees
+GET http://localhost:5220/api/trees
+
+###
+
+### Get a single tree
+GET http://localhost:5220/api/trees/1
+
+###
+
+### Search trees by name
+GET http://localhost:5220/api/trees/search?name=old
+
+###
+
+### Create a new tree
+POST http://localhost:5220/api/trees
+Content-Type: application/json
+
+{
+  "nickname": "Tiny Giant",
+  "age": 5,
+  "height": 18.5,
+  "lastWateredDate": "2026-04-30T00:00:00",
+  "notes": "Purchased at a local market.",
+  "imageUrl": null,
+  "speciesId": 2
+}
+
+###
+
+### Update an existing tree
+PUT http://localhost:5220/api/trees/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "nickname": "Old Man",
+  "age": 26,
+  "height": 46.0,
+  "lastWateredDate": "2026-05-01T00:00:00",
+  "notes": "Repotted again. Doing well.",
+  "imageUrl": null,
+  "speciesId": 1
+}
+
+###
+
+### Delete a tree
+DELETE http://localhost:5220/api/trees/4
+
+###

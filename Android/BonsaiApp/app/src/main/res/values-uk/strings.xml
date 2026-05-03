@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Колекція бонсай</string>
+
+    <string name="btn_browse_species">Переглянути види</string>
+    <string name="btn_my_collection">Моя колекція</string>
+    <string name="btn_add_tree">Додати дерево</string>
+    <string name="btn_save">Зберегти</string>
+    <string name="btn_delete">Видалити</string>
+    <string name="btn_edit">Редагувати</string>
+
+    <string name="label_featured_species">Вибраний вид</string>
+    <string name="label_origin">Походження:</string>
+    <string name="label_difficulty">Складність:</string>
+    <string name="label_species">Вид:</string>
+    <string name="label_age">Вік:</string>
+    <string name="label_height">Висота:</string>
+    <string name="label_last_watered">Останній полив:</string>
+    <string name="label_notes">Нотатки</string>
+    <string name="label_nickname">Назва</string>
+    <string name="label_add_tree">Додати дерево</string>
+    <string name="label_edit_tree">Редагувати дерево</string>
+    <string name="label_species_detail">Деталі виду</string>
+    <string name="label_trees">Мої дерева</string>
+    <string name="label_tree_detail">Деталі дерева</string>
+
+    <string name="hint_search">Пошук дерев…</string>
+    <string name="hint_nickname">наприклад, Старий</string>
+    <string name="hint_age">Вік у роках</string>
+    <string name="hint_height">Висота у см</string>
+    <string name="hint_notes">Нотатки (необовʼязково)…</string>
+
+    <string name="dialog_delete_title">Видалити дерево</string>
+    <string name="dialog_delete_message">Ви впевнені, що хочете видалити це дерево?</string>
+
+    <string name="error_loading">Помилка завантаження. Перевірте зʼєднання.</string>
+    <string name="error_fill_required">Заповніть усі обовʼязкові поля.</string>
+    <string name="error_select_species">Виберіть вид.</string>
+
+    <string name="msg_saved">Збережено успішно.</string>
+    <string name="msg_deleted">Дерево видалено.</string>
+</resources>

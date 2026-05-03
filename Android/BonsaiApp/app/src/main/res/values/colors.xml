@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bonsai green palette -->
+    <color name="green_50">#E8F5E9</color>
+    <color name="green_100">#C8E6C9</color>
+    <color name="green_200">#A5D6A7</color>
+    <color name="green_300">#81C784</color>
+    <color name="green_400">#66BB6A</color>
+    <color name="green_500">#4CAF50</color>
+    <color name="green_600">#43A047</color>
+    <color name="green_700">#388E3C</color>
+    <color name="green_800">#2E7D32</color>
+    <color name="green_900">#1B5E20</color>
+
+    <!-- Earth tones -->
+    <color name="brown_300">#A1887F</color>
+    <color name="brown_500">#795548</color>
+    <color name="brown_700">#5D4037</color>
+    <color name="brown_900">#3E2723</color>
+    <color name="cream">#FFF8E6</color>
+
+    <!-- Surfaces -->
+    <color name="bg_app">#F4F7F2</color>
+    <color name="surface_card">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_primary">#1B1B1F</color>
+    <color name="text_secondary">#5F6368</color>
+
+    <!-- Difficulty chips -->
+    <color name="chip_easy_bg">#DCEDC8</color>
+    <color name="chip_easy_fg">#33691E</color>
+    <color name="chip_medium_bg">#FFE0B2</color>
+    <color name="chip_medium_fg">#E65100</color>
+    <color name="chip_hard_bg">#FFCDD2</color>
+    <color name="chip_hard_fg">#B71C1C</color>
+
+    <!-- Aliases -->
+    <color name="green_primary">#2E7D32</color>
+    <color name="green_primary_dark">#1B5E20</color>
+    <color name="green_accent">#66BB6A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey_light">#EAEAEA</color>
+</resources>

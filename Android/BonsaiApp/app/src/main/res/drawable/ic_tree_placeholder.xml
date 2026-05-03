@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Foliage clusters -->
+    <path
+        android:fillColor="#388E3C"
+        android:pathData="M22,18 m-11,0 a11,8 0 1,0 22,0 a11,8 0 1,0 -22,0" />
+    <path
+        android:fillColor="#43A047"
+        android:pathData="M40,12 m-10,0 a10,7 0 1,0 20,0 a10,7 0 1,0 -20,0" />
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M50,22 m-9,0 a9,6 0 1,0 18,0 a9,6 0 1,0 -18,0" />
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M30,8 m-7,0 a7,5 0 1,0 14,0 a7,5 0 1,0 -14,0" />
+    <!-- Trunk -->
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M30,18 C28,28 34,32 31,42 L34,42 C31,32 36,28 34,16 Z" />
+    <!-- Pot -->
+    <path
+        android:fillColor="#A1887F"
+        android:pathData="M16,42 L48,42 L44,54 L20,54 Z" />
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M14,40 L50,40 L50,44 L14,44 Z" />
+    <!-- Pot rim shadow -->
+    <path
+        android:fillColor="#3E2723"
+        android:fillAlpha="0.25"
+        android:pathData="M14,43 L50,43 L50,44 L14,44 Z" />
+</vector>

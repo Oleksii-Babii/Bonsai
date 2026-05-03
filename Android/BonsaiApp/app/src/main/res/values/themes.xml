@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.BonsaiApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary -->
+        <item name="colorPrimary">@color/green_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/green_100</item>
+        <item name="colorOnPrimaryContainer">@color/green_900</item>
+
+        <!-- Secondary (earth) -->
+        <item name="colorSecondary">@color/brown_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/cream</item>
+        <item name="colorOnSecondaryContainer">@color/brown_700</item>
+
+        <!-- Tertiary -->
+        <item name="colorTertiary">@color/green_500</item>
+        <item name="colorOnTertiary">@color/white</item>
+
+        <!-- Surfaces -->
+        <item name="colorSurface">@color/surface_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/green_50</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+
+        <!-- Window -->
+        <item name="android:colorBackground">@color/bg_app</item>
+        <item name="android:windowBackground">@color/bg_app</item>
+        <item name="android:statusBarColor">@color/green_900</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="ThemeOverlay.BonsaiApp.Toolbar" parent="ThemeOverlay.Material3.Dark.ActionBar">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="Widget.BonsaiApp.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/green_700</item>
+        <item name="titleTextColor">@color/white</item>
+        <item name="subtitleTextColor">@color/green_100</item>
+        <item name="android:theme">@style/ThemeOverlay.BonsaiApp.Toolbar</item>
+        <item name="popupTheme">@style/ThemeOverlay.Material3</item>
+    </style>
+
+</resources>
