@@ -11,10 +11,12 @@ namespace BonsaiAPI.Controllers
     public class TreesController : ControllerBase
     {
         private readonly BonsaiContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public TreesController(BonsaiContext context)
+        public TreesController(BonsaiContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
         // GET: api/trees
@@ -74,6 +76,43 @@ namespace BonsaiAPI.Controllers
             return CreatedAtAction(nameof(GetTree), new { id = tree.Id }, tree);
         }
 
+        // POST: api/trees/1/image
+        [HttpPost("{id:int}/image")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UploadImage([FromRoute] int id, [FromForm] IFormFile image)
+        {
+            var tree = await _context.Trees.FindAsync(id);
+            if (tree == null) return NotFound();
+
+            if (image == null || image.Length == 0)
+                return BadRequest("No image provided.");
+
+            var ext = Path.GetExtension(image.FileName).ToLowerInvariant();
+            if (!new[] { ".jpg", ".jpeg", ".png", ".webp" }.Contains(ext))
+                return BadRequest("Unsupported image format. Use jpg, png, or webp.");
+
+            var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+            var uploadsDir = Path.Combine(webRoot, "uploads");
+            Directory.CreateDirectory(uploadsDir);
+
+            var filename = $"tree_{id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{ext}";
+            var filePath = Path.Combine(uploadsDir, filename);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            tree.ImageUrl = $"{baseUrl}/uploads/{filename}";
+            await _context.SaveChangesAsync();
+
+            return Ok(new { imageUrl = tree.ImageUrl });
+        }
+
         // PUT: api/trees/1
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -98,6 +137,7 @@ namespace BonsaiAPI.Controllers
             existing.LastWateredDate = tree.LastWateredDate;
             existing.Notes = tree.Notes;
             existing.ImageUrl = tree.ImageUrl;
+            existing.ImageData = tree.ImageData ?? existing.ImageData;
             existing.SpeciesId = tree.SpeciesId;
 
             await _context.SaveChangesAsync();

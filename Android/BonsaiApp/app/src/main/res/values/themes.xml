@@ -29,6 +29,10 @@
         <item name="android:windowBackground">@color/bg_app</item>
         <item name="android:statusBarColor">@color/green_900</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/bg_app</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.BonsaiApp.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.BonsaiApp.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.BonsaiApp.Large</item>
     </style>
 
     <style name="ThemeOverlay.BonsaiApp.Toolbar" parent="ThemeOverlay.Material3.Dark.ActionBar">
@@ -36,11 +40,68 @@
     </style>
 
     <style name="Widget.BonsaiApp.Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="android:background">@color/green_800</item>
+        <item name="android:background">@android:color/transparent</item>
         <item name="titleTextColor">@color/white</item>
         <item name="subtitleTextColor">@color/green_100</item>
         <item name="android:theme">@style/ThemeOverlay.BonsaiApp.Toolbar</item>
         <item name="popupTheme">@style/ThemeOverlay.Material3</item>
+    </style>
+
+    <style name="ShapeAppearance.BonsaiApp.Small" parent="ShapeAppearance.Material3.Corner.Small">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">14dp</item>
+    </style>
+
+    <style name="ShapeAppearance.BonsaiApp.Medium" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="ShapeAppearance.BonsaiApp.Large" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">32dp</item>
+    </style>
+
+    <style name="Widget.BonsaiApp.TopAppBar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="titleTextColor">@color/text_primary</item>
+        <item name="subtitleTextColor">@color/text_secondary</item>
+        <item name="navigationIconTint">@color/text_primary</item>
+        <item name="titleCentered">false</item>
+        <item name="popupTheme">@style/ThemeOverlay.Material3</item>
+    </style>
+
+    <style name="Widget.BonsaiApp.SearchField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/surface_tint</item>
+        <item name="boxStrokeColor">@color/card_border</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/text_tertiary</item>
+        <item name="startIconTint">@color/text_tertiary</item>
+    </style>
+
+    <style name="Widget.BonsaiApp.Input" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/surface_tint</item>
+        <item name="boxStrokeColor">@color/card_border</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+    </style>
+
+    <style name="Widget.BonsaiApp.PrimaryButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/green_800</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="Widget.BonsaiApp.SecondaryButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/card_border</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">20dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
     </style>
 
 </resources>

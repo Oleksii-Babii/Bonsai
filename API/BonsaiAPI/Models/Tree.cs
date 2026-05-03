@@ -25,6 +25,9 @@ namespace BonsaiAPI.Models
 
         public string? ImageUrl { get; set; }
 
+        [Column(TypeName = "nvarchar(max)")]
+        public string? ImageData { get; set; }
+
         [ForeignKey("Species")]
         public int SpeciesId { get; set; }
 

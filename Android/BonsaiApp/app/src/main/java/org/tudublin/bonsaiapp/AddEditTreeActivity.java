@@ -1,12 +1,20 @@
 package org.tudublin.bonsaiapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.tudublin.bonsaiapp.api.BonsaiApiService;
 import org.tudublin.bonsaiapp.api.RetrofitClient;
@@ -14,10 +22,16 @@ import org.tudublin.bonsaiapp.databinding.ActivityAddEditTreeBinding;
 import org.tudublin.bonsaiapp.model.Species;
 import org.tudublin.bonsaiapp.model.Tree;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,9 +40,27 @@ public class AddEditTreeActivity extends AppCompatActivity {
 
     public static final String EXTRA_TREE_ID = "org.tudublin.bonsaiapp.EDIT_TREE_ID";
     private static final String TAG = "BonsaiApp";
+    private static final int MAX_IMAGE_PX = 800;
+    private static final int JPEG_QUALITY = 80;
+
     private ActivityAddEditTreeBinding binding;
     private List<Species> speciesList = new ArrayList<>();
     private int editTreeId = -1;
+    private Uri selectedPhotoUri = null;
+    private String pendingImageData = null;
+
+    private final ActivityResultLauncher<String> pickPhotoLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    selectedPhotoUri = uri;
+                    Glide.with(this)
+                            .load(uri)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .centerCrop()
+                            .into(binding.imagePreview);
+                    binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +69,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         editTreeId = getIntent().getIntExtra(EXTRA_TREE_ID, -1);
@@ -51,8 +81,12 @@ public class AddEditTreeActivity extends AppCompatActivity {
         }
 
         loadSpeciesForSpinner();
-
-        binding.btnSave.setOnClickListener(v -> saveTree());
+        binding.btnPickPhoto.setOnClickListener(v -> pickPhotoLauncher.launch("image/*"));
+        binding.btnSave.setOnClickListener(v -> {
+            binding.btnSave.setEnabled(false);
+            binding.btnSave.setText("Saving…");
+            saveTree();
+        });
     }
 
     private void loadSpeciesForSpinner() {
@@ -63,14 +97,10 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     speciesList = response.body();
                     List<String> names = new ArrayList<>();
-                    for (Species s : speciesList) {
-                        names.add(s.getName());
-                    }
+                    for (Species s : speciesList) names.add(s.getName());
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(
                             AddEditTreeActivity.this,
-                            android.R.layout.simple_spinner_item,
-                            names
-                    );
+                            android.R.layout.simple_spinner_item, names);
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     binding.spinnerSpecies.setAdapter(adapter);
                 }
@@ -84,8 +114,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
     }
 
     private void loadExistingTree(int id) {
-        BonsaiApiService service = RetrofitClient.getService();
-        service.getTree(id).enqueue(new Callback<Tree>() {
+        RetrofitClient.getService().getTree(id).enqueue(new Callback<Tree>() {
             @Override
             public void onResponse(Call<Tree> call, Response<Tree> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -93,9 +122,17 @@ public class AddEditTreeActivity extends AppCompatActivity {
                     binding.editNickname.setText(tree.getNickname());
                     binding.editAge.setText(String.valueOf(tree.getAge()));
                     binding.editHeight.setText(String.valueOf(tree.getHeight()));
-                    if (tree.getNotes() != null) {
-                        binding.editNotes.setText(tree.getNotes());
+                    if (tree.getNotes() != null) binding.editNotes.setText(tree.getNotes());
+
+                    if (tree.getImageData() != null && !tree.getImageData().isEmpty()) {
+                        pendingImageData = tree.getImageData();
+                        byte[] bytes = Base64.decode(tree.getImageData(), Base64.DEFAULT);
+                        Glide.with(AddEditTreeActivity.this).load(bytes)
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .centerCrop().into(binding.imagePreview);
+                        binding.btnPickPhoto.setText(R.string.btn_change_photo);
                     }
+
                     for (int i = 0; i < speciesList.size(); i++) {
                         if (speciesList.get(i).getId() == tree.getSpeciesId()) {
                             binding.spinnerSpecies.setSelection(i);
@@ -119,12 +156,16 @@ public class AddEditTreeActivity extends AppCompatActivity {
         String notes = binding.editNotes.getText().toString().trim();
 
         if (nickname.isEmpty() || ageText.isEmpty() || heightText.isEmpty()) {
+            binding.btnSave.setEnabled(true);
+            binding.btnSave.setText(R.string.btn_save);
             Toast.makeText(this, R.string.error_fill_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
         int selectedSpeciesIndex = binding.spinnerSpecies.getSelectedItemPosition();
         if (speciesList.isEmpty() || selectedSpeciesIndex < 0) {
+            binding.btnSave.setEnabled(true);
+            binding.btnSave.setText(R.string.btn_save);
             Toast.makeText(this, R.string.error_select_species, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -136,6 +177,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
         tree.setNotes(notes.isEmpty() ? null : notes);
         tree.setLastWateredDate(LocalDate.now().toString() + "T00:00:00");
         tree.setSpeciesId(speciesList.get(selectedSpeciesIndex).getId());
+        if (pendingImageData != null && !pendingImageData.isEmpty()) tree.setImageData(pendingImageData);
 
         BonsaiApiService service = RetrofitClient.getService();
 
@@ -144,24 +186,24 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Tree> call, Response<Tree> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(AddEditTreeActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
-                        finish();
+                        Tree savedTree = response.body();
+                        if (savedTree != null) {
+                            uploadPhotoIfNeeded(savedTree.getId());
+                        } else {
+                            completeSaveSuccess();
+                        }
                     } else {
-                        String err = "HTTP " + response.code();
-                        try {
-                            if (response.errorBody() != null) {
-                                err += ": " + response.errorBody().string();
-                            }
-                        } catch (Exception ignored) {}
-                        Toast.makeText(AddEditTreeActivity.this, err, Toast.LENGTH_LONG).show();
-                        Log.e(TAG, "Create failed: " + err);
+                        binding.btnSave.setEnabled(true);
+                        binding.btnSave.setText(R.string.btn_save);
+                        showError("Create failed", response);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Tree> call, Throwable t) {
+                    binding.btnSave.setEnabled(true);
+                    binding.btnSave.setText(R.string.btn_save);
                     Toast.makeText(AddEditTreeActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Failed to create tree: " + t.getMessage());
                 }
             });
         } else {
@@ -170,26 +212,114 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(AddEditTreeActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
-                        finish();
+                        uploadPhotoIfNeeded(editTreeId);
                     } else {
-                        String err = "HTTP " + response.code();
-                        try {
-                            if (response.errorBody() != null) {
-                                err += ": " + response.errorBody().string();
-                            }
-                        } catch (Exception ignored) {}
-                        Toast.makeText(AddEditTreeActivity.this, err, Toast.LENGTH_LONG).show();
-                        Log.e(TAG, "Update failed: " + err);
+                        binding.btnSave.setEnabled(true);
+                        binding.btnSave.setText(R.string.btn_save);
+                        showError("Update failed", response);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
+                    binding.btnSave.setEnabled(true);
+                    binding.btnSave.setText(R.string.btn_save);
                     Toast.makeText(AddEditTreeActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Failed to update tree: " + t.getMessage());
                 }
             });
         }
+    }
+
+    private void uploadPhotoIfNeeded(int treeId) {
+        if (selectedPhotoUri == null) {
+            completeSaveSuccess();
+            return;
+        }
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                byte[] imageBytes = compressSelectedPhoto();
+                String mimeType = "image/jpeg";
+                RequestBody fileBody = RequestBody.create(MediaType.parse(mimeType), imageBytes);
+                MultipartBody.Part imagePart = MultipartBody.Part.createFormData(
+                        "image",
+                        "tree_" + treeId + ".jpg",
+                        fileBody
+                );
+
+                RetrofitClient.getService().uploadTreeImage(treeId, imagePart).enqueue(new Callback<okhttp3.ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            completeSaveSuccess();
+                        } else {
+                            binding.btnSave.setEnabled(true);
+                            binding.btnSave.setText(R.string.btn_save);
+                            showError("Image upload failed", response);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                        binding.btnSave.setEnabled(true);
+                        binding.btnSave.setText(R.string.btn_save);
+                        Toast.makeText(AddEditTreeActivity.this, "Image upload error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "Photo processing error", e);
+                runOnUiThread(() -> {
+                    binding.btnSave.setEnabled(true);
+                    binding.btnSave.setText(R.string.btn_save);
+                    Toast.makeText(AddEditTreeActivity.this, "Photo processing error", Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private byte[] compressSelectedPhoto() throws Exception {
+        InputStream is = getContentResolver().openInputStream(selectedPhotoUri);
+
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(is, null, opts);
+        if (is != null) is.close();
+
+        int scale = 1;
+        while (opts.outWidth / scale > MAX_IMAGE_PX || opts.outHeight / scale > MAX_IMAGE_PX) {
+            scale *= 2;
+        }
+
+        is = getContentResolver().openInputStream(selectedPhotoUri);
+        BitmapFactory.Options decodeOpts = new BitmapFactory.Options();
+        decodeOpts.inSampleSize = scale;
+        Bitmap bmp = BitmapFactory.decodeStream(is, null, decodeOpts);
+        if (is != null) is.close();
+
+        if (bmp == null) {
+            throw new IllegalStateException("Unable to decode selected image");
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out);
+        bmp.recycle();
+        return out.toByteArray();
+    }
+
+    private void completeSaveSuccess() {
+        runOnUiThread(() -> {
+            binding.btnSave.setEnabled(true);
+            binding.btnSave.setText(R.string.btn_save);
+            Toast.makeText(AddEditTreeActivity.this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
+            finish();
+        });
+    }
+
+    private void showError(String prefix, Response<?> response) {
+        String err = prefix + ": HTTP " + response.code();
+        try { if (response.errorBody() != null) err += " " + response.errorBody().string(); }
+        catch (Exception ignored) {}
+        Toast.makeText(this, err, Toast.LENGTH_LONG).show();
+        Log.e(TAG, err);
     }
 }

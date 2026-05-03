@@ -49,6 +49,8 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
         holder.textName.setText(species.getName());
         holder.textOrigin.setText(species.getOriginCountry());
         holder.textDifficulty.setText(species.getDifficultyLevel());
+        holder.textDifficulty.setBackgroundResource(getDifficultyChipBackground(species.getDifficultyLevel()));
+        holder.textDifficulty.setTextColor(holder.itemView.getContext().getColor(getDifficultyChipTextColor(species.getDifficultyLevel())));
 
         if (species.getImageUrl() != null && !species.getImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
@@ -62,6 +64,22 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
         }
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(species));
+    }
+
+    private int getDifficultyChipBackground(String difficulty) {
+        if (difficulty == null) return R.drawable.bg_chip_easy;
+        String normalized = difficulty.trim().toLowerCase();
+        if (normalized.contains("expert") || normalized.contains("hard")) return R.drawable.bg_chip_hard;
+        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.drawable.bg_chip_medium;
+        return R.drawable.bg_chip_easy;
+    }
+
+    private int getDifficultyChipTextColor(String difficulty) {
+        if (difficulty == null) return R.color.chip_easy_fg;
+        String normalized = difficulty.trim().toLowerCase();
+        if (normalized.contains("expert") || normalized.contains("hard")) return R.color.chip_hard_fg;
+        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.color.chip_medium_fg;
+        return R.color.chip_easy_fg;
     }
 
     @Override

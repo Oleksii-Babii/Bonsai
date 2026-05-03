@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Base64;
+
 import com.bumptech.glide.Glide;
 
 import org.tudublin.bonsaiapp.api.BonsaiApiService;
@@ -48,6 +50,14 @@ public class TreeDetailActivity extends AppCompatActivity {
         }
 
         loadTreeDetail(treeId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (treeId != -1) {
+            loadTreeDetail(treeId);
+        }
     }
 
     @Override
@@ -89,7 +99,13 @@ public class TreeDetailActivity extends AppCompatActivity {
                         binding.textSpecies.setText(getString(R.string.label_species) + " " + tree.getSpecies().getName());
                     }
 
-                    if (tree.getImageUrl() != null && !tree.getImageUrl().isEmpty()) {
+                    if (tree.getImageData() != null && !tree.getImageData().isEmpty()) {
+                        byte[] bytes = Base64.decode(tree.getImageData(), Base64.DEFAULT);
+                        Glide.with(TreeDetailActivity.this)
+                                .load(bytes)
+                                .placeholder(R.drawable.ic_tree_placeholder)
+                                .into(binding.imageTree);
+                    } else if (tree.getImageUrl() != null && !tree.getImageUrl().isEmpty()) {
                         Glide.with(TreeDetailActivity.this)
                                 .load(tree.getImageUrl())
                                 .placeholder(R.drawable.ic_tree_placeholder)

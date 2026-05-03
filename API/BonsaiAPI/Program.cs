@@ -1,12 +1,26 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using BonsaiAPI.Data;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseWebRoot("wwwroot");
+
+var useInMemoryDatabase = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
 builder.Services.AddDbContext<BonsaiContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BonsaiContext")
-        ?? throw new InvalidOperationException("Connection string 'BonsaiContext' not found.")));
+{
+    if (useInMemoryDatabase)
+    {
+        options.UseInMemoryDatabase("BonsaiLocalDev");
+    }
+    else
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("BonsaiContext")
+            ?? throw new InvalidOperationException("Connection string 'BonsaiContext' not found."));
+    }
+});
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -22,18 +36,40 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+// Allow image uploads up to 10 MB
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
+});
+
 var app = builder.Build();
+
+var webRootPath = app.Environment.WebRootPath ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(webRootPath);
+Directory.CreateDirectory(Path.Combine(webRootPath, "uploads"));
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BonsaiContext>();
-    db.Database.Migrate();
+    if (useInMemoryDatabase)
+    {
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        db.Database.Migrate();
+    }
 }
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors();
 

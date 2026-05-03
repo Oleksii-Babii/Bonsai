@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Base64;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
@@ -50,20 +52,29 @@ public class TreeAdapter extends RecyclerView.Adapter<TreeAdapter.ViewHolder> {
         holder.textAge.setText(tree.getAge() + " yrs");
         holder.textSpecies.setText(tree.getSpecies() != null ? tree.getSpecies().getName() : "");
 
-        String imageUrl = tree.getImageUrl();
-        if ((imageUrl == null || imageUrl.isEmpty()) && tree.getSpecies() != null) {
-            imageUrl = tree.getSpecies().getImageUrl();
-        }
-
-        if (imageUrl != null && !imageUrl.isEmpty()) {
+        if (tree.getImageData() != null && !tree.getImageData().isEmpty()) {
+            byte[] bytes = Base64.decode(tree.getImageData(), Base64.DEFAULT);
             Glide.with(holder.itemView.getContext())
-                    .load(imageUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .load(bytes)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .placeholder(R.drawable.ic_tree_placeholder)
                     .centerCrop()
                     .into(holder.imageTree);
         } else {
-            holder.imageTree.setImageResource(R.drawable.ic_tree_placeholder);
+            String imageUrl = tree.getImageUrl();
+            if ((imageUrl == null || imageUrl.isEmpty()) && tree.getSpecies() != null) {
+                imageUrl = tree.getSpecies().getImageUrl();
+            }
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.ic_tree_placeholder)
+                        .centerCrop()
+                        .into(holder.imageTree);
+            } else {
+                holder.imageTree.setImageResource(R.drawable.ic_tree_placeholder);
+            }
         }
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(tree));

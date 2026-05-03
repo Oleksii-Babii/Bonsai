@@ -118,6 +118,9 @@ namespace BonsaiAPI.Migrations
                     b.Property<decimal>("Height")
                         .HasColumnType("decimal(8, 2)");
 
+                    b.Property<string>("ImageData")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 

@@ -8,6 +8,7 @@ public class Tree {
     private String lastWateredDate;
     private String notes;
     private String imageUrl;
+    private String imageData;
     private int speciesId;
     private Species species;
 
@@ -31,6 +32,9 @@ public class Tree {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getImageData() { return imageData; }
+    public void setImageData(String imageData) { this.imageData = imageData; }
 
     public int getSpeciesId() { return speciesId; }
     public void setSpeciesId(int speciesId) { this.speciesId = speciesId; }

@@ -57,7 +57,9 @@ public class SpeciesDetailActivity extends AppCompatActivity {
                     Species species = response.body();
                     binding.textName.setText(species.getName());
                     binding.textOrigin.setText(getString(R.string.label_origin) + " " + species.getOriginCountry());
-                    binding.textDifficulty.setText(getString(R.string.label_difficulty) + " " + species.getDifficultyLevel());
+                    binding.textDifficulty.setText(species.getDifficultyLevel());
+                    binding.textDifficulty.setBackgroundResource(getDifficultyChipBackground(species.getDifficultyLevel()));
+                    binding.textDifficulty.setTextColor(getColor(getDifficultyChipTextColor(species.getDifficultyLevel())));
                     binding.textDescription.setText(species.getDescription());
 
                     if (species.getImageUrl() != null && !species.getImageUrl().isEmpty()) {
@@ -78,5 +80,21 @@ public class SpeciesDetailActivity extends AppCompatActivity {
                 Log.e(TAG, "Error loading species detail: " + t.getMessage());
             }
         });
+    }
+
+    private int getDifficultyChipBackground(String difficulty) {
+        if (difficulty == null) return R.drawable.bg_chip_easy;
+        String normalized = difficulty.trim().toLowerCase();
+        if (normalized.contains("expert") || normalized.contains("hard")) return R.drawable.bg_chip_hard;
+        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.drawable.bg_chip_medium;
+        return R.drawable.bg_chip_easy;
+    }
+
+    private int getDifficultyChipTextColor(String difficulty) {
+        if (difficulty == null) return R.color.chip_easy_fg;
+        String normalized = difficulty.trim().toLowerCase();
+        if (normalized.contains("expert") || normalized.contains("hard")) return R.color.chip_hard_fg;
+        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.color.chip_medium_fg;
+        return R.color.chip_easy_fg;
     }
 }
