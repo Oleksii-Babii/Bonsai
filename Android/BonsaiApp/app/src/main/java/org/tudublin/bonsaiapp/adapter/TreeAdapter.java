@@ -7,15 +7,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Base64;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.tudublin.bonsaiapp.R;
 import org.tudublin.bonsaiapp.model.Tree;
+import org.tudublin.bonsaiapp.util.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +31,19 @@ public class TreeAdapter extends RecyclerView.Adapter<TreeAdapter.ViewHolder> {
     }
 
     public void updateData(List<Tree> newItems) {
-        items = newItems;
-        notifyDataSetChanged();
+        final List<Tree> oldItems = items;
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override public int getOldListSize() { return oldItems.size(); }
+            @Override public int getNewListSize() { return newItems.size(); }
+            @Override public boolean areItemsTheSame(int oldPos, int newPos) {
+                return oldItems.get(oldPos).getId() == newItems.get(newPos).getId();
+            }
+            @Override public boolean areContentsTheSame(int oldPos, int newPos) {
+                return oldItems.get(oldPos).equals(newItems.get(newPos));
+            }
+        });
+        items = new ArrayList<>(newItems);
+        result.dispatchUpdatesTo(this);
     }
 
     @NonNull
@@ -48,34 +56,11 @@ public class TreeAdapter extends RecyclerView.Adapter<TreeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Tree tree = items.get(position);
-        holder.textNickname.setText(tree.getNickname());
+        holder.textNickname.setText(tree.getNickname() != null ? tree.getNickname() : "");
         holder.textAge.setText(tree.getAge() + " yrs");
         holder.textSpecies.setText(tree.getSpecies() != null ? tree.getSpecies().getName() : "");
 
-        if (tree.getImageData() != null && !tree.getImageData().isEmpty()) {
-            byte[] bytes = Base64.decode(tree.getImageData(), Base64.DEFAULT);
-            Glide.with(holder.itemView.getContext())
-                    .load(bytes)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .placeholder(R.drawable.ic_tree_placeholder)
-                    .centerCrop()
-                    .into(holder.imageTree);
-        } else {
-            String imageUrl = tree.getImageUrl();
-            if ((imageUrl == null || imageUrl.isEmpty()) && tree.getSpecies() != null) {
-                imageUrl = tree.getSpecies().getImageUrl();
-            }
-            if (imageUrl != null && !imageUrl.isEmpty()) {
-                Glide.with(holder.itemView.getContext())
-                        .load(imageUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .placeholder(R.drawable.ic_tree_placeholder)
-                        .centerCrop()
-                        .into(holder.imageTree);
-            } else {
-                holder.imageTree.setImageResource(R.drawable.ic_tree_placeholder);
-            }
-        }
+        ImageUtils.loadTreeImage(holder.imageTree, tree);
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(tree));
     }

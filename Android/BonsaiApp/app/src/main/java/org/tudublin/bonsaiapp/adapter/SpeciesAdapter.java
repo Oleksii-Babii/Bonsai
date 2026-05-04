@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -14,6 +15,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.tudublin.bonsaiapp.R;
 import org.tudublin.bonsaiapp.model.Species;
+import org.tudublin.bonsaiapp.util.DifficultyUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +34,19 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
     }
 
     public void updateData(List<Species> newItems) {
-        items = newItems;
-        notifyDataSetChanged();
+        final List<Species> oldItems = items;
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override public int getOldListSize() { return oldItems.size(); }
+            @Override public int getNewListSize() { return newItems.size(); }
+            @Override public boolean areItemsTheSame(int oldPos, int newPos) {
+                return oldItems.get(oldPos).getId() == newItems.get(newPos).getId();
+            }
+            @Override public boolean areContentsTheSame(int oldPos, int newPos) {
+                return oldItems.get(oldPos).equals(newItems.get(newPos));
+            }
+        });
+        items = new ArrayList<>(newItems);
+        result.dispatchUpdatesTo(this);
     }
 
     @NonNull
@@ -49,8 +62,7 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
         holder.textName.setText(species.getName());
         holder.textOrigin.setText(species.getOriginCountry());
         holder.textDifficulty.setText(species.getDifficultyLevel());
-        holder.textDifficulty.setBackgroundResource(getDifficultyChipBackground(species.getDifficultyLevel()));
-        holder.textDifficulty.setTextColor(holder.itemView.getContext().getColor(getDifficultyChipTextColor(species.getDifficultyLevel())));
+        DifficultyUtils.applyTo(holder.textDifficulty, species.getDifficultyLevel());
 
         if (species.getImageUrl() != null && !species.getImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
@@ -64,22 +76,6 @@ public class SpeciesAdapter extends RecyclerView.Adapter<SpeciesAdapter.ViewHold
         }
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(species));
-    }
-
-    private int getDifficultyChipBackground(String difficulty) {
-        if (difficulty == null) return R.drawable.bg_chip_easy;
-        String normalized = difficulty.trim().toLowerCase();
-        if (normalized.contains("expert") || normalized.contains("hard")) return R.drawable.bg_chip_hard;
-        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.drawable.bg_chip_medium;
-        return R.drawable.bg_chip_easy;
-    }
-
-    private int getDifficultyChipTextColor(String difficulty) {
-        if (difficulty == null) return R.color.chip_easy_fg;
-        String normalized = difficulty.trim().toLowerCase();
-        if (normalized.contains("expert") || normalized.contains("hard")) return R.color.chip_hard_fg;
-        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.color.chip_medium_fg;
-        return R.color.chip_easy_fg;
     }
 
     @Override

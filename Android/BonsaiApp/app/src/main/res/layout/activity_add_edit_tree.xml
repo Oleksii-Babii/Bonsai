@@ -104,7 +104,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tree profile"
+                        android:text="@string/label_tree_profile"
                         android:textColor="@color/text_primary"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -113,7 +113,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Add the essentials and choose a photo that gives the tree its identity."
+                        android:text="@string/hint_tree_profile_subtitle"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 

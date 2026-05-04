@@ -1,5 +1,7 @@
 package org.tudublin.bonsaiapp.model;
 
+import java.util.Objects;
+
 public class Tree {
     private int id;
     private String nickname;
@@ -41,4 +43,24 @@ public class Tree {
 
     public Species getSpecies() { return species; }
     public void setSpecies(Species species) { this.species = species; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tree)) return false;
+        Tree other = (Tree) o;
+        return id == other.id
+                && age == other.age
+                && Double.compare(height, other.height) == 0
+                && speciesId == other.speciesId
+                && Objects.equals(nickname, other.nickname)
+                && Objects.equals(notes, other.notes)
+                && Objects.equals(imageData, other.imageData)
+                && Objects.equals(imageUrl, other.imageUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nickname, age, height, notes, imageData, imageUrl, speciesId);
+    }
 }

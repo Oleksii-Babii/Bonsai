@@ -1,5 +1,7 @@
 package org.tudublin.bonsaiapp.model;
 
+import java.util.Objects;
+
 public class Species {
     private int id;
     private String name;
@@ -25,4 +27,21 @@ public class Species {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Species)) return false;
+        Species other = (Species) o;
+        return id == other.id
+                && Objects.equals(name, other.name)
+                && Objects.equals(originCountry, other.originCountry)
+                && Objects.equals(difficultyLevel, other.difficultyLevel)
+                && Objects.equals(imageUrl, other.imageUrl);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, originCountry, difficultyLevel, imageUrl);
+    }
 }

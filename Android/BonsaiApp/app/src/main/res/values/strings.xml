@@ -36,6 +36,12 @@
     <string name="error_loading">Failed to load data. Check your connection.</string>
     <string name="error_fill_required">Please fill in all required fields.</string>
     <string name="error_select_species">Please select a species.</string>
+    <string name="error_photo_processing">Photo processing error.</string>
+    <string name="error_network">Network error: %s</string>
+    <string name="btn_saving">Saving…</string>
+    <string name="error_invalid_numbers">Age and height must be valid numbers.</string>
+    <string name="label_tree_profile">Tree profile</string>
+    <string name="hint_tree_profile_subtitle">Add the essentials and choose a photo that gives the tree its identity.</string>
 
     <string name="msg_saved">Saved successfully.</string>
     <string name="msg_deleted">Tree deleted.</string>

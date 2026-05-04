@@ -21,6 +21,7 @@ import org.tudublin.bonsaiapp.api.RetrofitClient;
 import org.tudublin.bonsaiapp.databinding.ActivityTreeListBinding;
 import org.tudublin.bonsaiapp.model.Tree;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -91,6 +92,12 @@ public class TreeListActivity extends AppCompatActivity {
         loadAllTrees();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        searchHandler.removeCallbacksAndMessages(null);
+    }
+
     private void loadAllTrees() {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.emptyView.setVisibility(View.GONE);
@@ -107,7 +114,7 @@ public class TreeListActivity extends AppCompatActivity {
                     String err = "HTTP " + response.code();
                     try {
                         if (response.errorBody() != null) err += ": " + response.errorBody().string();
-                    } catch (Exception ignored) {}
+                    } catch (IOException e) { Log.w(TAG, "Could not read error body", e); }
                     binding.emptyView.setText(err);
                     binding.emptyView.setVisibility(View.VISIBLE);
                     Toast.makeText(TreeListActivity.this, err, Toast.LENGTH_LONG).show();
@@ -134,11 +141,20 @@ public class TreeListActivity extends AppCompatActivity {
             public void onResponse(Call<List<Tree>> call, Response<List<Tree>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     displayTrees(response.body());
+                } else {
+                    String err = "Search failed: HTTP " + response.code();
+                    binding.emptyView.setText(err);
+                    binding.emptyView.setVisibility(View.VISIBLE);
+                    Log.e(TAG, err);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Tree>> call, Throwable t) {
+                String msg = getString(R.string.error_network, t.getMessage());
+                binding.emptyView.setText(msg);
+                binding.emptyView.setVisibility(View.VISIBLE);
+                Toast.makeText(TreeListActivity.this, msg, Toast.LENGTH_LONG).show();
                 Log.e(TAG, "Search error: " + t.getMessage());
             }
         });

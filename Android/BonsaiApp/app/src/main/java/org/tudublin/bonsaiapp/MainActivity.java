@@ -14,6 +14,7 @@ import org.tudublin.bonsaiapp.api.BonsaiApiService;
 import org.tudublin.bonsaiapp.api.RetrofitClient;
 import org.tudublin.bonsaiapp.databinding.ActivityMainBinding;
 import org.tudublin.bonsaiapp.model.Species;
+import org.tudublin.bonsaiapp.util.DifficultyUtils;
 
 import java.util.List;
 
@@ -57,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     binding.textFeaturedName.setText(featured.getName());
                     binding.textFeaturedOrigin.setText(featured.getOriginCountry());
                     binding.textFeaturedDifficulty.setText(featured.getDifficultyLevel());
-                    binding.textFeaturedDifficulty.setBackgroundResource(getDifficultyChipBackground(featured.getDifficultyLevel()));
-                    binding.textFeaturedDifficulty.setTextColor(getColor(getDifficultyChipTextColor(featured.getDifficultyLevel())));
+                    DifficultyUtils.applyTo(binding.textFeaturedDifficulty, featured.getDifficultyLevel());
                     if (featured.getImageUrl() != null && !featured.getImageUrl().isEmpty()) {
                         Glide.with(MainActivity.this)
                                 .load(featured.getImageUrl())
@@ -78,19 +78,4 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private int getDifficultyChipBackground(String difficulty) {
-        if (difficulty == null) return R.drawable.bg_chip_easy;
-        String normalized = difficulty.trim().toLowerCase();
-        if (normalized.contains("expert") || normalized.contains("hard")) return R.drawable.bg_chip_hard;
-        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.drawable.bg_chip_medium;
-        return R.drawable.bg_chip_easy;
-    }
-
-    private int getDifficultyChipTextColor(String difficulty) {
-        if (difficulty == null) return R.color.chip_easy_fg;
-        String normalized = difficulty.trim().toLowerCase();
-        if (normalized.contains("expert") || normalized.contains("hard")) return R.color.chip_hard_fg;
-        if (normalized.contains("intermediate") || normalized.contains("medium")) return R.color.chip_medium_fg;
-        return R.color.chip_easy_fg;
-    }
 }

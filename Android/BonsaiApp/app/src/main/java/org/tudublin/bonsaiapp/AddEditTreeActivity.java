@@ -23,6 +23,7 @@ import org.tudublin.bonsaiapp.model.Species;
 import org.tudublin.bonsaiapp.model.Tree;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
                         binding.btnPickPhoto.setText(R.string.btn_change_photo);
                     } catch (Exception e) {
                         Log.e(TAG, "Photo processing error", e);
-                        Toast.makeText(this, "Photo processing error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.error_photo_processing, Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -85,7 +86,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
         binding.btnPickPhoto.setOnClickListener(v -> pickPhotoLauncher.launch("image/*"));
         binding.btnSave.setOnClickListener(v -> {
             binding.btnSave.setEnabled(false);
-            binding.btnSave.setText("Saving…");
+            binding.btnSave.setText(R.string.btn_saving);
             saveTree();
         });
     }
@@ -127,18 +128,29 @@ public class AddEditTreeActivity extends AppCompatActivity {
 
                     if (tree.getImageData() != null && !tree.getImageData().isEmpty()) {
                         pendingImageData = tree.getImageData();
-                        byte[] bytes = Base64.decode(tree.getImageData(), Base64.DEFAULT);
-                        Glide.with(AddEditTreeActivity.this).load(bytes)
-                                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                .centerCrop().into(binding.imagePreview);
-                        binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                        try {
+                            byte[] bytes = Base64.decode(tree.getImageData(), Base64.DEFAULT);
+                            Glide.with(AddEditTreeActivity.this).load(bytes)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .centerCrop().into(binding.imagePreview);
+                            binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                        } catch (IllegalArgumentException e) {
+                            Log.e(TAG, "Invalid base64 image data for tree " + id, e);
+                            pendingImageData = null;
+                        }
                     }
 
+                    int selectedIndex = -1;
                     for (int i = 0; i < speciesList.size(); i++) {
                         if (speciesList.get(i).getId() == tree.getSpeciesId()) {
-                            binding.spinnerSpecies.setSelection(i);
+                            selectedIndex = i;
                             break;
                         }
+                    }
+                    if (selectedIndex >= 0) {
+                        binding.spinnerSpecies.setSelection(selectedIndex);
+                    } else {
+                        Log.w(TAG, "Species id " + tree.getSpeciesId() + " not found in list — may not have loaded yet");
                     }
                 }
             }
@@ -173,8 +185,19 @@ public class AddEditTreeActivity extends AppCompatActivity {
 
         Tree tree = new Tree();
         tree.setNickname(nickname);
-        tree.setAge(Integer.parseInt(ageText));
-        tree.setHeight(Double.parseDouble(heightText));
+        int age;
+        double height;
+        try {
+            age = Integer.parseInt(ageText);
+            height = Double.parseDouble(heightText);
+        } catch (NumberFormatException e) {
+            binding.btnSave.setEnabled(true);
+            binding.btnSave.setText(R.string.btn_save);
+            Toast.makeText(this, R.string.error_invalid_numbers, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        tree.setAge(age);
+        tree.setHeight(height);
         tree.setNotes(notes.isEmpty() ? null : notes);
         tree.setLastWateredDate(LocalDate.now().toString() + "T00:00:00");
         tree.setSpeciesId(speciesList.get(selectedSpeciesIndex).getId());
@@ -199,7 +222,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 public void onFailure(Call<Tree> call, Throwable t) {
                     binding.btnSave.setEnabled(true);
                     binding.btnSave.setText(R.string.btn_save);
-                    Toast.makeText(AddEditTreeActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddEditTreeActivity.this, getString(R.string.error_network, t.getMessage()), Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -220,30 +243,30 @@ public class AddEditTreeActivity extends AppCompatActivity {
                 public void onFailure(Call<Void> call, Throwable t) {
                     binding.btnSave.setEnabled(true);
                     binding.btnSave.setText(R.string.btn_save);
-                    Toast.makeText(AddEditTreeActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddEditTreeActivity.this, getString(R.string.error_network, t.getMessage()), Toast.LENGTH_LONG).show();
                 }
             });
         }
     }
 
     private byte[] compressPhoto(Uri uri) throws Exception {
-        InputStream is = getContentResolver().openInputStream(uri);
-
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(is, null, opts);
-        if (is != null) is.close();
+        try (InputStream is = getContentResolver().openInputStream(uri)) {
+            BitmapFactory.decodeStream(is, null, opts);
+        }
 
         int scale = 1;
         while (opts.outWidth / scale > MAX_IMAGE_PX || opts.outHeight / scale > MAX_IMAGE_PX) {
             scale *= 2;
         }
 
-        is = getContentResolver().openInputStream(uri);
         BitmapFactory.Options decodeOpts = new BitmapFactory.Options();
         decodeOpts.inSampleSize = scale;
-        Bitmap bmp = BitmapFactory.decodeStream(is, null, decodeOpts);
-        if (is != null) is.close();
+        Bitmap bmp;
+        try (InputStream is = getContentResolver().openInputStream(uri)) {
+            bmp = BitmapFactory.decodeStream(is, null, decodeOpts);
+        }
 
         if (bmp == null) {
             throw new IllegalStateException("Unable to decode selected image");
@@ -267,7 +290,7 @@ public class AddEditTreeActivity extends AppCompatActivity {
     private void showError(String prefix, Response<?> response) {
         String err = prefix + ": HTTP " + response.code();
         try { if (response.errorBody() != null) err += " " + response.errorBody().string(); }
-        catch (Exception ignored) {}
+        catch (IOException e) { Log.w(TAG, "Could not read error body", e); }
         Toast.makeText(this, err, Toast.LENGTH_LONG).show();
         Log.e(TAG, err);
     }
