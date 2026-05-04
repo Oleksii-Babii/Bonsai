@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -28,6 +30,8 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,23 +49,44 @@ public class AddEditTreeActivity extends AppCompatActivity {
     private int editTreeId = -1;
     private String pendingImageData = null;
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
     private final ActivityResultLauncher<String> pickPhotoLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri != null) {
+                if (uri == null) return;
+
+                // Disable button immediately so the user knows work is happening
+                binding.btnPickPhoto.setEnabled(false);
+
+                // compressPhoto() does disk I/O + bitmap decode/encode — move off main thread
+                executor.execute(() -> {
                     try {
                         byte[] bytes = compressPhoto(uri);
-                        pendingImageData = Base64.encodeToString(bytes, Base64.NO_WRAP);
-                        Glide.with(this)
-                                .load(bytes)
-                                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                .centerCrop()
-                                .into(binding.imagePreview);
-                        binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                        String encoded = Base64.encodeToString(bytes, Base64.NO_WRAP);
+
+                        // Post UI updates back to the main thread
+                        mainHandler.post(() -> {
+                            if (isDestroyed()) return;
+                            pendingImageData = encoded;
+                            Glide.with(AddEditTreeActivity.this)
+                                    .load(bytes)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .centerCrop()
+                                    .into(binding.imagePreview);
+                            binding.btnPickPhoto.setText(R.string.btn_change_photo);
+                            binding.btnPickPhoto.setEnabled(true);
+                        });
                     } catch (Exception e) {
                         Log.e(TAG, "Photo processing error", e);
-                        Toast.makeText(this, R.string.error_photo_processing, Toast.LENGTH_LONG).show();
+                        mainHandler.post(() -> {
+                            if (isDestroyed()) return;
+                            binding.btnPickPhoto.setEnabled(true);
+                            Toast.makeText(AddEditTreeActivity.this,
+                                    R.string.error_photo_processing, Toast.LENGTH_LONG).show();
+                        });
                     }
-                }
+                });
             });
 
     @Override
@@ -89,6 +114,12 @@ public class AddEditTreeActivity extends AppCompatActivity {
             binding.btnSave.setText(R.string.btn_saving);
             saveTree();
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executor.shutdownNow();
     }
 
     private void loadSpeciesForSpinner() {
